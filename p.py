@@ -139,10 +139,11 @@ if st.session_state["page"] == "login":
     
     if st.button("Login"):
         if company_input.strip():
-            cursor.execute(" company_name, online_payment_enabled FROM admin_requests WHERE LOWER(company_name) = LOWER(%s)", (company_input.strip(),))
+            cursor.execute(" SELECT email,company_name, online_payment_enabled FROM admin_requests WHERE LOWER(company_name) = LOWER(%s)", (company_input.strip(),))
             admin_row = cursor.fetchone()
             
             if admin_row:
+                st.session_state["email"] = admin_row["email"]
                 st.session_state["menu_title"] = admin_row["company_name"]
                 st.session_state["online_payment_enabled"] = bool(admin_row["online_payment_enabled"])
                 st.session_state["page"] = "menu"
@@ -978,5 +979,6 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
