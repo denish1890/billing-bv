@@ -27,7 +27,7 @@ try:
         host="gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
         user="3mSr1JcCPJKrQSt.root",
         password="xk9feq6Cx6ZaPnFQ",
-        database=st."cafe",
+        database="cafe",
         port=4000,
         ssl_verify_identity=True,  # REQUIRED for TiDB
         ssl_ca="/etc/ssl/certs/ca-certificates.crt" # Standard for Streamlit Cloud
@@ -979,3 +979,4 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
