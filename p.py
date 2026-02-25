@@ -24,12 +24,12 @@ st.set_page_config(
 try:
 
 db = mysql.connector.connect(
-    host=st.secrets["DB_HOST"],
-    user=st.secrets["DB_USER"],
-    password=st.secrets["DB_PASSWORD"],
-    database=st.secrets["DB_NAME"]
+    host="YOUR_HOST",
+    user="YOUR_USER",
+    password="YOUR_PASSWORD",
+    database="YOUR_DATABASE",
+    port=3306
 )
-
 cursor = db.cursor(dictionary=True)
 except Exception as e:
     st.error(f"Database Connection Failed: {e}")
