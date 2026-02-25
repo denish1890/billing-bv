@@ -13,23 +13,28 @@ import time
 
 # --- INITIAL CONFIGURATION ---
 st.set_page_config(
-    page_title="Jay Vachhraj",
+    page_title="Admin Login · Company Portal",
+    page_icon="🔐",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 # --- DATABASE CONNECTION ---
-# Note: Ensure your local MySQL server is runningtr
-db = mysql.connector.connect(
-    host="STREAMLIT",
-    user="YOUR_USER",
-    password="YOUR_PASSWORD",
-    database="MYSQL",
-    port=3306
-)
-cursor = db.cursor(dictionary=True)
+# Note: Ensure your local MySQL server is running
+try:
+   # --- DATABASE CONNECTION (TiDB Cloud) ---
+    db = mysql.connector.connect(
+        host="gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
+        user="3mSr1JcCPJKrQSt.root",
+        password="xk9feq6Cx6ZaPnFQ",
+        database=st."cafe",
+        port=4000,
+        ssl_verify_identity=True,  # REQUIRED for TiDB
+        ssl_ca="/etc/ssl/certs/ca-certificates.crt" # Standard for Streamlit Cloud
+    )
+    cursor = db.cursor(dictionary=True)
 except Exception as e:
-    st.error(f"Database Connection Failed: {e}")
+    st.error(f"TiDB Connection Failed: {e}")
     st.stop()
 
 # --- DIRECTORIES ---
@@ -154,6 +159,7 @@ if st.session_state["page"] == "login":
     st.markdown('</div>', unsafe_allow_html=True)
 
 # --- 1. PAGE CONFIG & STYLING ---
+st.set_page_config(page_title="Jay Vachraj", layout="centered", initial_sidebar_state="collapsed")
 db_menu = []
 
 # Get all unique categories from the items fetched from DB
@@ -973,12 +979,3 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
-
-
-
-
-
-
-
-
-
