@@ -1,0 +1,5 @@
+streamlit
+Pillow
+qrcode
+fpdf
+mysql-connector-python
