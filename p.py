@@ -32,7 +32,8 @@ try:
     ssl_verify_identity=True,
     ssl_ca="/etc/ssl/certs/ca-certificates.crt" # This path is correct for Streamlit Cloud
     )
-
+except mysql.connector.Error as err:
+        print(f"Error: {err}")
 # --- DIRECTORIES ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IMAGE_DIR = os.path.join(BASE_DIR, "menu_images")
@@ -975,6 +976,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
