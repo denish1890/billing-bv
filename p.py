@@ -157,29 +157,7 @@ if st.session_state["page"] == "login":
             
     st.markdown('<div style="margin-top:20px; text-align:center; color:gray; font-size:0.8rem;">Demo Version</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
-    # 1. Fetch the menu items for the logged-in company
-cursor.execute(
-    "SELECT name, price, category FROM admin_requests WHERE company_name = %s AND status = 'Approved'", 
-    (st.session_state["menu_title"],)
-)
-menu_items = cursor.fetchall()
-
-# 2. Display them in a grid
-if menu_items:
-    # Create columns for a grid layout (3 items per row)
-    cols = st.columns(3)
-    for idx, item in enumerate(menu_items):
-        with cols[idx % 3]:
-            st.markdown(f"""
-                <div style="border:1px solid #ddd; padding:10px; border-radius:10px; text-align:center;">
-                    <h4>{item['name']}</h4>
-                    <p style="color:orange; font-weight:bold;">₹{item['price']}</p>
-                    <span style="font-size:0.8rem; color:gray;">{item['category'].upper()}</span>
-                </div>
-            """, unsafe_allow_html=True)
-else:
-    st.info("No menu items found. Add some in the database!")
-
+    
 # --- 1. PAGE CONFIG & STYLING ---
 st.set_page_config(page_title="jay vacharaj", layout="centered", initial_sidebar_state="collapsed")
 db_menu = []
@@ -1001,6 +979,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
