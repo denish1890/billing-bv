@@ -27,7 +27,7 @@ try:
         host="gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
         port=4000,
         user="4Er7E7yAa5CmneH.root",
-        password="ZQOsXcW2Vz1xrytD",
+        password=st.secrets["tidb_password"]
         database="cafe",
         ssl_verify_identity=True,
         ssl_ca="/etc/ssl/certs/ca-certificates.crt"
@@ -979,6 +979,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
