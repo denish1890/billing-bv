@@ -31,11 +31,7 @@ try:
     database="cafe",
     ssl_verify_identity=True,
     ssl_ca="/etc/ssl/certs/ca-certificates.crt" # This path is correct for Streamlit Cloud
-)
-    cursor = db.cursor(dictionary=True)
-except Exception as e:
-    st.error(f"TiDB Connection Failed: {e}")
-    st.stop()
+    )
 
 # --- DIRECTORIES ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -979,6 +975,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
