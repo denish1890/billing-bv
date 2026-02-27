@@ -22,19 +22,21 @@ st.set_page_config(
 # --- DATABASE CONNECTION ---
 # Note: Ensure your local MySQL server is running
 try:
-   # --- DATABASE CONNECTION (TiDB Cloud) ---
+    # --- DATABASE CONNECTION (TiDB Cloud) ---
     db = mysql.connector.connect(
         host="gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
         port=4000,
-        user= "4Er7E7yAa5CmneH.root", # Copy this from your TiDB dashboard
-        password="ZQOsXcW2Vz1xrytD", # The password you set for the cluster
+        user="4Er7E7yAa5CmneH.root",
+        password="ZQOsXcW2Vz1xrytD",
         database="cafe",
         ssl_verify_identity=True,
-        ssl_ca="/etc/ssl/certs/ca-certificates.crt" # This path is correct for Streamlit Cloud
+        ssl_ca="/etc/ssl/certs/ca-certificates.crt"
     )
-   cursor = db.cursor(dictionary=True);
+    # This line must be indented exactly like 'db =' above it
+    cursor = db.cursor(dictionary=True) 
+
 except mysql.connector.Error as err:
-        print(f"Error: {err}")
+    print(f"Error: {err}")
 # --- DIRECTORIES ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IMAGE_DIR = os.path.join(BASE_DIR, "menu_images")
@@ -977,6 +979,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
