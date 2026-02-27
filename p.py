@@ -587,7 +587,7 @@ else:
         
     
     if st.session_state["page"]== "cart":
- st.title("Your Cart")
+       st.title("Your Cart")
  
  if not st.session_state["items"]:
      st.warning("Your Cart Is Empty!")
@@ -989,6 +989,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
