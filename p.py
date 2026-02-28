@@ -578,25 +578,22 @@ else:
 
     if total_qty > 0:
         if st.button(f"🛒 View Cart ({total_qty} items) · ₹{total_price}", use_container_width=True, type="primary"):
-            st.session_state["page"] = "cart"
-            st.rerun()
+           st.session_state["page"] = "cart":
+           st.rerun()
     else:
-        st.button("🛒 Cart is Empty", use_container_width=True, disabled=True)
-        
-    st.markdown('</div>', unsafe_allow_html=True)
-        
-    
-   if st.session_state["page"]== "cart":
-       st.title("Your Cart")
+         st.button("🛒 Cart is Empty", use_container_width=True, disabled=True)
+         st.markdown('</div>', unsafe_allow_html=True)
+    if st.session_state["page"]== "cart"
+           st.title("Your Cart")
  
-      if not st.session_state["items"]:
-     st.warning("Your Cart Is Empty!")
+        if not st.session_state["items"]:
+              st.warning("Your Cart Is Empty!")
  
-      for i in st.session_state["items"].copy():
-    idx = st.session_state["items"].index(i)
-    col1, col2, col3, col4 = st.columns([4,3,2,1])
+        for i in st.session_state["items"].copy():
+             idx = st.session_state["items"].index(i)
+             col1, col2, col3, col4 = st.columns([4,3,2,1])
 
-    with col1:
+             with col1:
         # Display image from session (PIL)
         if i["image"]:
             img = load_image(i["image"])
@@ -989,6 +986,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
