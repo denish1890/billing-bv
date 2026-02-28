@@ -1,4 +1,4 @@
-import streamlit as st
+timport streamlit as st
 from PIL import Image
 import qrcode
 import io
@@ -979,3 +979,4 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
