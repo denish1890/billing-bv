@@ -21,6 +21,12 @@ st.set_page_config(
 
 # --- DATABASE CONNECTION ---
 # Note: Ensure your local MySQL server is running
+port = os.getenv("MYSQLPORT")
+
+if port is None:
+    port = 3306
+else:
+    port = int(port)
 try:
     # --- DATABASE CONNECTION (TiDB Cloud) ---
     db = mysql.connector.connect(
@@ -28,7 +34,7 @@ try:
     user=os.getenv("root"),
     password=os.getenv("PNQPJXiWzVHdvjWgTeeCwnVJRclpCOjr"),
     database=os.getenv("railway"),
-    port=os.getenv(3306)
+    port=portr
 )
     # This line must be indented exactly like 'db =' above it
     cursor = db.cursor(dictionary=True) 
@@ -977,6 +983,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
