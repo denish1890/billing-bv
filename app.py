@@ -35,7 +35,7 @@ try:
     password=os.getenv("PNQPJXiWzVHdvjWgTeeCwnVJRclpCOjr"),
     database=os.getenv("railway"),
     port=port
-)
+    )
     # This line must be indented exactly like 'db =' above it
     cursor = db.cursor(dictionary=True) 
 
@@ -983,6 +983,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
