@@ -24,14 +24,12 @@ st.set_page_config(
 try:
     # --- DATABASE CONNECTION (TiDB Cloud) ---
     db = mysql.connector.connect(
-        host="gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
-        port=4000,
-        user="4Er7E7yAa5CmneH.root",
-        password="JubMX8vnCyJqhX96",
-        database="cafe",
-        ssl_verify_identity=True,
-        ssl_ca="/etc/ssl/certs/ca-certificates.crt"
-    )
+    host=os.getenv("mysql.railway.internal"),
+    user=os.getenv("root"),
+    password=os.getenv("PNQPJXiWzVHdvjWgTeeCwnVJRclpCOjr"),
+    database=os.getenv("railway"),
+    port=os.getenv("3306")
+)
     # This line must be indented exactly like 'db =' above it
     cursor = db.cursor(dictionary=True) 
 
@@ -979,6 +977,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
