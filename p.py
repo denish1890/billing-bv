@@ -546,7 +546,7 @@ if st.session_state["page"] == "menu":
                                 label="Qty",
                                 min_value=0, step=1,
                                 value=existing_item["quantity"] if existing_item else 0,
-                                key=f"qty_{v_name}_{price}_{i}", 
+                               key=f"qty_{item['id']}_{v_name}_{i}",
                                 label_visibility="collapsed"
                             )
 
@@ -987,6 +987,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
