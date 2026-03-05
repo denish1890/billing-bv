@@ -29,11 +29,13 @@ else:
     port = int(port)
 # --- DATABASE CONNECTION (TiDB Cloud) ---
 db = mysql.connector.connect(
-    host="mysql.railway.internal",
-    user="root",
-    password="PNQPJXiWzVHdvjWgTeeCwnVJRclpCOjr",
-    database="railway",
-    port=3306
+        host="gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
+        port=4000,
+        user="4Er7E7yAa5CmneH.root",
+        password="JubMX8vnCyJqhX96",
+        database="cafe",
+        ssl_verify_identity=True,
+        ssl_ca="/etc/ssl/certs/ca-certificates.crt"
 )
 # This line must be indented exactly like 'db =' above it
 cursor = db.cursor(dictionary=True)  
@@ -172,11 +174,14 @@ for cat in db_categories:
 
     
 if st.session_state.get("email"):
-    cursor.execute("""
-        SELECT id, name, image, variants, available, email
-        FROM menu_items
-        WHERE available=1 AND email=%s
-    """,st.write("DEBUG EMAIL:", st.session_state.get("email")))
+    email = st.session_state.get("email")
+st.write("DEBUG EMAIL:", email)
+
+cursor.execute("""
+SELECT id, name, image, variants, available, email
+FROM menu_items
+WHERE available=1 AND email=%s
+""", (email,))
     db_menu = cursor.fetchall()
     st.write("DEBUG MENU:", db_menu)
 if st.session_state["page"] == "menu":
@@ -412,8 +417,6 @@ if st.session_state["page"] == "menu":
             background-color: white !important;
             padding: 15px !important;
             box-shadow: 0 -4px 12px rgba(0,0,0,0.1) !important;
-            z-index: 1000 !important;
-        }
     </style>
     """, unsafe_allow_html=True)
     
@@ -979,6 +982,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
