@@ -21,13 +21,6 @@ st.set_page_config(
 
 # --- DATABASE CONNECTION ---
 # Note: Ensure your local MySQL server is running
-port = os.getenv("MYSQLPORT")
-
-if port is None:
-    port = 3306
-else:
-    port = int(port)
-# --- DATABASE CONNECTION (TiDB Cloud) ---
 db = mysql.connector.connect(
         host="gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
         port=4000,
@@ -37,8 +30,8 @@ db = mysql.connector.connect(
         ssl_verify_identity=True,
         ssl_ca="/etc/ssl/certs/ca-certificates.crt"
 )
-# This line must be indented exactly like 'db =' above it
-cursor = db.cursor(dictionary=True)  
+cursor = db.cursor(dictionary=True)
+
 # --- DIRECTORIES ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IMAGE_DIR = os.path.join(BASE_DIR, "menu_images")
@@ -68,51 +61,6 @@ def load_image(image_path):
             pass
 
     return Image.new("RGB", (300, 300), (200, 200, 200))
-
-# --- CUSTOM CSS (Your Design) ---
-st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-    
-    .stApp {
-        background: hsl(33, 39%, 82%);
-        font-family: 'Inter', sans-serif;
-    }
-    
-    .login-card {
-        background: #ffffff;
-        max-width: 440px;
-        width: 90%; /* Changed from 100% for better margins on mobile */
-        padding: 2rem 1.5rem; /* Reduced padding for mobile */
-        border-radius: 24px;
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.05);
-        border: 1px solid hsla(30, 2%, 21%, 0.2);
-        margin: 2rem auto;
-    }
-
-    /* Media Query for larger screens */
-    @media (min-width: 480px) {
-        .login-card {
-            padding: 2.8rem 2.5rem 3.2rem 2.5rem;
-            width: 100%;
-        }
-    }
-    
-    .stButton > button {
-        width: 100%;
-        height: 3.5rem; /* Explicit height for easier tapping */
-        background: hsla(21, 81%, 51%, 0.9) !important;
-        border-radius: 50px !important;
-        color: white !important;
-        font-weight: 600 !important;
-    }
-
-    /* Make images rounded and mobile-friendly */
-    img {
-        border-radius: 15px;
-    }
-</style>
-""", unsafe_allow_html=True)
 
 
 def get_today_order_number(cursor, db, email):
@@ -172,521 +120,227 @@ categories = [{"id": "all", "label": "🍽️ All"}]
 for cat in db_categories:
     categories.append({"id": cat.lower(), "label": cat})
 
-if st.session_state["page"] == "menu":
-
-    email = st.session_state.get("email")
-
-    cursor = db.cursor(dictionary=True)
-
+    
+if st.session_state.get("email"):
     cursor.execute("""
-    SELECT id, name, image, variants
-    FROM menu_items
-    WHERE available = 1
-    AND is_active = 1
-    AND email = %s
-    """, (email,))
-
+        SELECT id, name, image, variants, available, email
+        FROM menu_items
+        WHERE available=1 AND email=%s
+    """, (st.session_state["email"],))
     db_menu = cursor.fetchall()
 
-    for item in db_menu:
-        st.write(item["name"])
-   # Custom CSS for styling
+if st.session_state["page"] == "menu":
+    # --- UPDATED CSS (Removed Horizontal Forced Scroll) ---
     st.markdown("""
     <style>
-        /* Main container styling */
-        .stApp {
-            background-color: #f5f3f0;
-        }
-        
-        /* Welcome title styling */
-        .welcome-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #2d2d2d;
-            margin-bottom: 12px;
-        }
-        
-        .welcome-title span {
-            background: #fceee6;
-            padding: 2px 8px 2px 0;
-            border-radius: 30px;
-            font-weight: 500;
-            color: #a5512c;
-        }
-        
-        /* Category pills styling */
-        .category-pill {
-            display: inline-block;
-            background: #f2ece7;
-            border: 1px solid #e2d3c8;
-            border-radius: 40px;
-            padding: 10px 24px;
-            font-size: 16px;
-            font-weight: 500;
-            color: #3b2c22;
-            margin: 0 5px;
-            cursor: pointer;
-            transition: all 0.15s;
-            white-space: nowrap;
-        }
-        
-        .category-pill.active {
-            background: #1e1e1e;
-            color: white;
-            border-color: #1e1e1e;
-        }
-        
-        /* Search bar styling */
-        .search-wrapper {
-            display: flex;
-            align-items: center;
-            background: #f7f7f7;
-            border-radius: 30px;
-            padding: 6px 18px;
-            border: 1px solid #eaeaea;
-            margin: 15px 0;
-        }
-        
-        /* Item card styling */
-        .item-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 12px;
-            border: 1px solid #f0e3da;
-            margin-bottom: 15px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .item-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.06);
-        }
-        
-        .item-image {
-            width: 100%;
-            height: 130px;
-            border-radius: 16px;
-            object-fit: cover;
-            margin-bottom: 12px;
-        }
-        
-        .item-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #2b2b2b;
-        }
-        
-        .item-name small {
-            font-weight: 400;
-            font-size: 12px;
-            color: #6b4f3a;
-            display: block;
-        }
-        
-        .item-price {
-            font-weight: 650;
-            font-size: 18px;
-            color: #1e1e1e;
-            margin: 8px 0;
-        }
-        
-        .item-description {
-            font-size: 11px;
-            color: #8f7a6a;
-            margin-bottom: 8px;
-        }
-        
-        /* Quantity selector */
-        .quantity-selector {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f8f8f8;
-            border: 1px solid #ddcfc4;
-            border-radius: 40px;
-            padding: 4px 2px;
-            margin-top: 8px;
-        }
-        
-        .qty-btn {
-            background: white;
-            border: 1px solid #ddcfc4;
-            border-radius: 30px;
-            width: 36px;
-            height: 36px;
-            font-size: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #7b5f4b;
-            cursor: pointer;
-        }
-        
-        .qty-number {
-            min-width: 30px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 18px;
-        }
-        
-        /* Cart button */
-        .cart-button {
-            background: #1e1e1e;
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 16px 20px;
-            border-radius: 60px;
-            font-weight: 600;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            margin-top: 20px;
-            border: 1px solid #262626;
-        }
-        
-        /* Remove default Streamlit padding */
-        .main > div {
-            padding: 0 !important;
-        }
-        
-        /* Hide Streamlit branding */
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-                
-        /* Ensure the column container doesn't add extra padding */
-        [data-testid="column"] {
-            padding: 0px 5px !important;
-        }
-        
-    
-        .custom-item-image {
-            width: 100%;
-            height: 130px;
-            border-radius: 16px;
-            object-fit: cover;
-            margin-bottom: 10px;
-        }
-    
-        .item-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #2b2b2b;
-            margin-bottom: 8px;
+        /* Keep the pill shape for buttons */
+        .stButton > button {
+            border-radius: 20px !important; 
+            padding: 5px 15px !important;
+            border: 1px solid #ddd !important;
         }
                 
-        /* 1. Add this to your existing <style> block */
-        /* Horizontal scrolling for category buttons on mobile */
-        div[data-testid="stHorizontalBlock"]:has(button[key^="cat_"]) {
-            overflow-x: auto !important;
-            flex-wrap: nowrap !important;
-            gap: 10px !important;
-            padding-bottom: 10px !important;
+        .fixed-top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #f5f3f0;
+            z-index: 1000;
+            padding: 10px 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
-        div[data-testid="stHorizontalBlock"]:has(button[key^="cat_"]) > div {
-            min-width: 120px !important; /* Ensures buttons don't shrink too much */
+        /* Fixed Footer Styling */
+        .mobile-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            padding: 10px;
+            z-index: 1000;
+            border-top: 1px solid #ddd;
         }
-        
-        /* Make number input buttons more touch-friendly for mobile */
-        div[data-testid="stNumberInput"] {
-            width: 100% !important;
-        }
-        
-        .item-price {
-            font-size: 16px !important; /* Slightly smaller for mobile grid */
-            margin-top: 5px !important;
-        }
-        
-        .item-name {
-            line-height: 1.2;
-            min-height: 40px; /* Keeps grid aligned */
-        }
-                
-        .scrollable-menu {
-            max-height: 70vh !important; /* Takes up 70% of the screen height */
-            overflow-y: auto !important;
-            padding: 10px !important;
-            border-radius: 15px !important;
-            background: rgba(255, 255, 255, 0.2) !important; /* Subtle contrast */
-        }
-            
-        .sticky-footer {
-            position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            background-color: white !important;
-            padding: 15px !important;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.1) !important;
     </style>
     """, unsafe_allow_html=True)
     
-    menu_to_show = db_menu
-    
-    if 'selected_category' not in st.session_state:
-        st.session_state.selected_category = 'all'
-    
-    if 'search_term' not in st.session_state:
-        st.session_state.search_term = ''
-
-
-    # Create a dictionary for quick access
-    item_dict = {item["id"]: item for item in menu_to_show}
-    
-    # Header
-    st.markdown("""
-    <div class="welcome-title">
-        WELCOME TO <span>'jay vachraj'</span>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Search bar
-    search = st.text_input("🔍", placeholder="Search item...", 
-                           key="search_input", label_visibility="collapsed")
-    st.session_state.search_term = search.lower() if search else ""
-
-    # --- DYNAMIC CATEGORY EXTRACTION ---
-    # 1. Get unique categories from your DB results
-    unique_cats = sorted(list(set([item['name'] for item in db_menu if item.get('name')])))
-    
-    # 2. Build the categories list dynamically
-    categories = [{"id": "all", "label": "🍽️ All"}]
-    for cat in unique_cats:
-        categories.append({"id": cat.lower(), "label": cat})
-    
-    # --- RENDER CATEGORY BUTTONS ---
-    # These will scroll horizontally on mobile thanks to the CSS above
-    cat_cols = st.columns(len(categories))
-    for i, category in enumerate(categories):
-        with cat_cols[i]:
-            if st.button(
-                category["label"],
-                key=f"cat_{category['id']}",
-                use_container_width=True,
-                type="primary" if st.session_state.selected_category == category['id'] else "secondary"
-            ):
-                st.session_state.selected_category = category['id']
-                st.rerun()
-    
-    # Menu items display
-    st.markdown("### 📋 OUR MENU · <span style='color: #a5512c; font-size: 14px;'>fresh & tasty</span>", 
-                unsafe_allow_html=True)
-    
-    # Category Filtering logic (based on your dynamic categories)
-    # Filter logic based on selected category and search term
-    # Filter and Flatten Logic
-    search_query = st.session_state.get('search_input', '').lower()
-    selected_cat = st.session_state.get('selected_category', 'all')
-
-    menu_to_show = []
-    for item in db_menu:
-        # 1. Check Category and Search
-        match_cat = (selected_cat == "all" or item['name'].lower() == selected_cat)
-        match_search = (not search_query or search_query in item["name"].lower())
+    # --- 1. RENDER THE CATEGORY SELECTOR ---
+    with st.container():
+        # 1. RENDER STICKY HEADER AREA
+        # We use an empty markdown with a class 'sticky-header' to let CSS find this container
+        st.markdown(f"""
+            <div class="fixed-top">
+                <div style="font-size:18px; font-weight:bold; margin-bottom:10px;">
+                    WELCOME TO <span style="color:#a5512c;">{st.session_state.get('menu_title', 'Jay Vachraj')}</span>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        unique_cats = sorted(list(set([item['name'] for item in db_menu])))
+        cat_options = ["All"] + unique_cats
+        search_query = st.text_input("🔍 Search", placeholder="Search items...", key="search_input", label_visibility="collapsed")
         
-        if match_cat and match_search:
-            item_variants = json.loads(item.get("variants") or "[]")
-            if not item_variants:
-                item_variants = [{"name": "Standard", "price": 0}]
+        # Using a selectbox or simple buttons without the "flex-nowrap" CSS 
+        # allows them to behave normally.
+        selected_cat = st.radio("Categories", cat_options, horizontal=True, label_visibility="collapsed")
+        st.session_state.selected_category = selected_cat
+
+    # --- 2. FILTER AND FLATTEN DATA ---
+    display_items = []
+    for item in db_menu:
+        if (selected_cat == "All" or item['name'] == selected_cat) and \
+           (not search_query or search_query.lower() in item["name"].lower()):
             
-            # 2. CREATE A SEPARATE CARD FOR EVERY VARIANT
-            for v in item_variants:
-                variant_item = item.copy()
-                variant_item['active_variant_name'] = v['name']
-                variant_item['active_variant_price'] = v['price']
-                # Unique key for identifying this specific card
-                variant_item['unique_key'] = f"{item['id']}_{v['name']}"
-                menu_to_show.append(variant_item)
-    
-    import base64
+            import json
+            variants = json.loads(item.get("variants") or "[]")
+            if not variants: variants = [{"name": "Standard", "price": 0}]
+            
+            for v in variants:
+                display_items.append({
+                    "id": item["id"], "name": item["name"], "image": item["image"],
+                    "v_name": v["name"], "v_price": v["price"]
+                })
 
-    def get_image_base64(img):
-        buffered = io.BytesIO()
-        img.save(buffered, format="PNG")
-        return base64.b64encode(buffered.getvalue()).decode()
-    
-    # --- START SCROLLABLE AREA ---
-    st.markdown('<div class="scrollable-menu">', unsafe_allow_html=True)
+    # --- 3. RENDER MENU ITEMS (Single Column - No Scroll) ---
+    for item in display_items:
+        # Each item gets its own container, creating a natural vertical list
+        with st.container(border=True):
+            c1, c2 = st.columns([1, 2])
+            
+            with c1:
+                img = load_image(item["image"])
+                st.image(img, use_container_width=True)  
+            
+            with c2:
+                st.markdown(f"""
+                    <div style="line-height: 1.2;">
+                        <strong style="font-size: 14px;">{item['v_name']}</strong><br>
+                        <span style="color:gray; font-size:11px;">{item['name']}</span>
+                    </div>
+                    <div style="font-weight:bold; font-size:16px; margin-top: 5px;">₹{item['v_price']}</div>
+                """, unsafe_allow_html=True)
+                
+                # Existing Qty Logic
+                existing = next((x for x in st.session_state["items"] if x["menu_id"] == item["id"] and x["variant"] == item['v_name']), None)
+                st.markdown("<p style='font-size:12px; margin-top:10px; margin-bottom:0px;'>Qty:</p>", unsafe_allow_html=True)
+                qty = st.number_input(
+                    "Qty", 
+                    min_value=0, 
+                    step=1, 
+                    value=existing["quantity"] if existing else 0, 
+                    key=f"q_{item['id']}_{item['v_name']}", 
+                    label_visibility="collapsed"
+                )
+                
+                # Update Session State
+                if qty > 0:
+                    if existing:
+                        existing["quantity"] = qty
+                        existing["total"] = qty * item['v_price']
+                    else:
+                        st.session_state["items"].append({
+                            "item": item["name"], "menu_id": item["id"], "price": item['v_price'],
+                            "quantity": qty, "total": qty * item['v_price'], "variant": item['v_name'], "image": item["image"]
+                        })
+                elif existing:
+                    st.session_state["items"] = [x for x in st.session_state["items"] if not (x["menu_id"] == item["id"] and x["variant"] == item['v_name'])]
 
-    # Grid Layout
-    for i in range(0, len(menu_to_show), 2):
-        cols = st.columns(2)
-        for j in range(2):
-            if i + j < len(menu_to_show):
-                item = menu_to_show[i + j]
-                v_name = item['active_variant_name']
-                price = item['active_variant_price']
-                u_key = item['unique_key'] # Use this for the key
-
-                with cols[j]:
-                    pil_img = load_image(item["image"])
-                    img_base64 = get_image_base64(pil_img)
-
-                    with st.container(border=True):
-                        st.markdown(f"""
-                            <img src="data:image/png;base64,{img_base64}" class="custom-item-image">
-                            <div class="item-name"><strong>{v_name}</strong><br>
-                            <small style='color:gray;'>{item['name']}</small></div>
-                        """, unsafe_allow_html=True)
-    
-                        v_col1, v_col2 = st.columns([1, 1.2])
-                        with v_col1:
-                            st.markdown(f"<div class='item-price'>₹{price}</div>", unsafe_allow_html=True)
-                        
-                        with v_col2:
-                            existing_item = next((x for x in st.session_state["items"] 
-                                                if x["menu_id"] == item["id"] and x["variant"] == v_name), None)
-                            
-                            # Fix: Use unique_key to prevent duplicate widget ID errors
-                            qty = st.number_input(
-                                label="Qty",
-                                min_value=0, step=1,
-                                value=existing_item["quantity"] if existing_item else 0,
-                               key=f"qty_{item['id']}_{v_name}_{i}",
-                                label_visibility="collapsed"
-                            )
-
-                        # Update Cart Logic
-                        if qty > 0:
-                            if existing_item:
-                                existing_item["quantity"] = qty
-                                existing_item["total"] = qty * price
-                            else:
-                                st.session_state["items"].append({
-                                    "item": item["name"], "menu_id": item["id"],
-                                    "price": price, "quantity": qty, "total": qty * price,
-                                    "image": item["image"], "variant": v_name
-                                })
-                        elif existing_item:
-                            st.session_state["items"] = [x for x in st.session_state["items"] if not (x["menu_id"] == item["id"] and x["variant"] == v_name)]
-
-    # --- CLOSE SCROLLABLE AREA (OUTSIDE THE LOOP) ---
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # We use a container to wrap the button so we can apply the sticky CSS
-    st.markdown('<div class="sticky-footer">', unsafe_allow_html=True)
-    
-    # Calculate totals for the button label
+    # --- 4. RENDER FIXED FOOTER ---
     total_qty = sum(x["quantity"] for x in st.session_state["items"])
     total_price = sum(x["total"] for x in st.session_state["items"])
 
+    st.markdown('<div class="mobile-footer">', unsafe_allow_html=True)
     if total_qty > 0:
-        if st.button(f"🛒 View Cart ({total_qty} items) · ₹{total_price}", use_container_width=True, type="primary"):
+        if st.button(f"🛒 View Cart ({total_qty}) · ₹{total_price}", use_container_width=True, type="primary"):
             st.session_state["page"] = "cart"
             st.rerun()
     else:
-        st.button("🛒 Cart is Empty", use_container_width=True, disabled=True)
-        
+        st.button("🛒 Your Cart is Empty", use_container_width=True, disabled=True)
     st.markdown('</div>', unsafe_allow_html=True)
         
     
-elif st.session_state["page"]== "cart":
- st.title("Your Cart")
- 
- if not st.session_state["items"]:
-     st.warning("Your Cart Is Empty!")
- 
- for i in st.session_state["items"].copy():
-    idx = st.session_state["items"].index(i)
-    col1, col2, col3, col4 = st.columns([4,3,2,1])
-
-    with col1:
-        # Display image from session (PIL)
-        if i["image"]:
-            img = load_image(i["image"])
-            st.image(img, width=60)
-
-        else:
-            st.image(Image.new("RGB", (60, 60), color=(200, 200, 200)))
-
-        st.write(f"**{i['item']}**")
-
-    with col2:
-        st.markdown(
-            f"""
-            **{i['item']}**  
-            <span style="color:gray;">Variant: {i['variant']}</span>
-            """,
-            unsafe_allow_html=True
-        )
-
-
-    with col3:
-        new_qty = st.number_input(
-            "Qty",
-            min_value=0,
-            value=i["quantity"],
-            key=f"cart_{i['menu_id']}_{i['variant']}"
-        )
-        i["quantity"] = new_qty
-        i["total"] = new_qty * i["price"]
-
-    with col4:
-        if st.button("❌", key=f"remove_{i['menu_id']}_{i['variant']}"):
-            st.session_state["items"].remove(i)
-            st.rerun()
-
-
-    if new_qty == 0:
-        st.session_state["items"].remove(i)
-        st.rerun()
-         
- 
- total = sum(i["total"] for i in st.session_state["items"])
- st.markdown(f"### 💰 Total: {total}₹")
- 
- col1, col2, col3 = st.columns(3)
- 
- with col1:
-     if st.button("Add item "):
-         st.session_state["page"]="menu"
-         st.rerun()
- 
- with col2:
-     if st.button("Clear all"):
-         st.session_state["items"]=[]
-         st.rerun()
-
- # 🔹 Table number input
- st.session_state["table_no"] = st.number_input(
-     "🍽️ Table Number",
-     min_value=0,
-     step=1,
-     value=st.session_state.get("table_no", 0)
- )
-
-
- # 🔹 Customer name input (always visible before clicking Done)
- st.session_state["customer_name"] = st.text_input(
-    "Enter your name:", st.session_state.get("customer_name", "")
- )
+elif st.session_state["page"] == "cart":
+    st.markdown("<h2 style='text-align: center;'>🛒 Your Shopping Cart</h2>", unsafe_allow_html=True)
     
- st.session_state["customer_address"] = st.text_area(
-    "Enter your address:",
-    st.session_state.get("customer_address", ""),
-    height=80
- )
+    if not st.session_state["items"]:
+        st.info("Your cart is empty!")
+        if st.button("Go to Menu"):
+            st.session_state["page"] = "menu"
+            st.rerun()
+    else:
+        # Loop through items
+        for i in st.session_state["items"].copy():
+            # Create a "Card" for each item using a container
+            with st.container(border=True):
+                # We use 2 columns for the top row: Image + Details/Price
+                top_col1, top_col2 = st.columns([1, 3])
+                
+                with top_col1:
+                    if i["image"]:
+                        img = load_image(i["image"])
+                        st.image(img, use_container_width=True)
+                    else:
+                        st.image("https://via.placeholder.com/100", use_container_width=True)
 
- if "customer_address" not in st.session_state:
-    st.session_state["customer_address"] = ""
+                with top_col2:
+                    st.markdown(f"**{i['item']}**")
+                    st.caption(f"Variant: {i['variant']} | Price: {i['price']}₹")
+                
+                # We use 2 columns for the bottom row: Quantity + Remove button
+                # This stacks perfectly on mobile
+                bot_col1, bot_col2 = st.columns([3, 1])
+                
+                with bot_col1:
+                    new_qty = st.number_input(
+                        "Qty",
+                        min_value=0,
+                        value=i["quantity"],
+                        key=f"cart_{i['menu_id']}_{i['variant']}",
+                        label_visibility="collapsed" # Hides label to save vertical space
+                    )
+                    i["quantity"] = new_qty
+                    i["total"] = new_qty * i["price"]
+                
+                with bot_col2:
+                    if st.button("🗑️", key=f"remove_{i['menu_id']}_{i['variant']}", use_container_width=True):
+                        st.session_state["items"].remove(i)
+                        st.rerun()
 
+                # Logic check for zero quantity
+                if new_qty == 0:
+                    st.session_state["items"].remove(i)
+                    st.rerun()
 
- with col3:
-    if st.button("Done"):
-        if not st.session_state["customer_name"].strip():
-            st.warning("⚠️ Please enter your name")
-            st.stop()
+        # --- Footer Section ---
+        st.divider()
+        total = sum(i["total"] for i in st.session_state["items"])
+        st.markdown(f"### Total Amount: <span style='color:green'>{total}₹</span>", unsafe_allow_html=True)
 
-        st.session_state["bill_items"] = st.session_state["items"].copy()
-        st.session_state["total_amount"] = sum(
-            i["total"] for i in st.session_state["bill_items"]
-        )
-        st.session_state["page"] = "bill"
-        st.rerun()
+        # Checkout Form
+        with st.expander("👤 Checkout Details", expanded=True):
+            st.session_state["customer_name"] = st.text_input("Name", st.session_state.get("customer_name", ""))
+            st.session_state["table_no"] = st.number_input("Table #", min_value=0, value=st.session_state.get("table_no", 1))
+            st.session_state["customer_address"] = st.text_area("Notes/Address", st.session_state.get("customer_address", ""))
+
+        # Action Buttons
+        btn_col1, btn_col2 = st.columns(2)
+        with btn_col1:
+            if st.button("➕ Add More", use_container_width=True):
+                st.session_state["page"] = "menu"
+                st.rerun()
+        with btn_col2:
+            if st.button("🧹 Clear", use_container_width=True):
+                st.session_state["items"] = []
+                st.rerun()
+
+        if st.button("✅ Confirm Order", type="primary", use_container_width=True):
+            if not st.session_state["customer_name"].strip():
+                st.warning("Please enter your name")
+            else:
+                st.session_state["bill_items"] = st.session_state["items"].copy()
+                st.session_state["total_amount"] = total
+                st.session_state["page"] = "bill"
+                st.rerun()
 
 
 
@@ -987,28 +641,3 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
