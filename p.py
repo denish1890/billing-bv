@@ -50,7 +50,7 @@ def load_image(image_path):
         return Image.new("RGB", (300, 300), (200, 200, 200))
 
     # If DB path is relative, resolve it
-   def load_image(image_path):
+def load_image(image_path):
     if not image_path:
         return Image.new("RGB", (300, 300), (200, 200, 200))
 
@@ -647,6 +647,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
