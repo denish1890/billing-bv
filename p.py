@@ -193,9 +193,10 @@ if st.session_state["page"] == "menu":
         with c1:
                 img_string = item["image"] # This is now the Base64 string from TiDB
             
-            if img_string and len(img_string) > 100: # Check if it's a valid string
+            if: 
+               img_string and len(img_string) > 100: # Check if it's a valid string
                 # Display the string directly as an image
-                st.image(f"data:image/png;base64,{img_string}", use_container_width=True)
+               st.image(f"data:image/png;base64,{img_string}", use_container_width=True)
             else:
                 # Fallback if no image exists
                 st.image("https://via.placeholder.com/150", caption="No Image", use_container_width=True)
@@ -630,6 +631,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
