@@ -45,20 +45,6 @@ if "items" not in st.session_state:
 if "email" not in st.session_state:
     st.session_state["email"] = None
 
-def load_image(image_path):
-    if not image_path:
-        return Image.new("RGB", (300, 300), (200, 200, 200))
-
-    full_path = os.path.join(IMAGE_DIR, os.path.basename(image_path))
-
-    if os.path.exists(full_path):
-        try:
-            return Image.open(full_path)
-        except:
-            pass
-
-    return Image.new("RGB", (300, 300), (200, 200, 200))
-
 
 def get_today_order_number(cursor, db, email):
     today = datetime.now().date()
@@ -204,8 +190,8 @@ if st.session_state["page"] == "menu":
        with st.container(border=True):
         c1, c2 = st.columns([1, 2])
         
-        with c1:
-            img_string = item["image"] # This is now the Base64 string from TiDB
+            with c1:
+                img_string = item["image"] # This is now the Base64 string from TiDB
             
             if img_string and len(img_string) > 100: # Check if it's a valid string
                 # Display the string directly as an image
@@ -644,6 +630,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
