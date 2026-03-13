@@ -10,6 +10,13 @@ import urllib.parse
 import json
 import os
 import time
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config(
+    cloud_name="dfnd7rqbg",
+    api_key="635954955762459",
+    api_secret="EcCKClRGodV5S1oeEk5LBvANA-k"
 
 # --- INITIAL CONFIGURATION ---
 st.set_page_config(
@@ -640,6 +647,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
