@@ -10,14 +10,6 @@ import urllib.parse
 import json
 import os
 import time
-import cloudinary
-import cloudinary.uploader
-
-cloudinary.config(
-    cloud_name="dfnd7rqbg",
-    api_key="635954955762459",
-    api_secret="EcCKClRGodV5S1oeEk5LBvANA-k"
-)
 
 # --- INITIAL CONFIGURATION ---
 st.set_page_config(
@@ -41,7 +33,9 @@ db = mysql.connector.connect(
 cursor = db.cursor(dictionary=True)
 
 # --- DIRECTORIES ---
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+IMAGE_DIR = os.path.join(BASE_DIR, "menu_images")
+os.makedirs(IMAGE_DIR, exist_ok=True)
 
 # --- SESSION STATE INITIALIZATION ---
 if "page" not in st.session_state:
@@ -54,7 +48,9 @@ if "email" not in st.session_state:
 def load_image(image_path):
     if not image_path:
         return Image.new("RGB", (300, 300), (200, 200, 200))
-        
+
+    full_path = os.path.join(IMAGE_DIR, os.path.basename(image_path))
+
     if os.path.exists(full_path):
         try:
             return Image.open(full_path)
@@ -210,6 +206,10 @@ if st.session_state["page"] == "menu":
             
             with c1:
                 st.write("DB Image Path:", item["image"])
+
+                full_path = os.path.join(BASE_DIR, item["image"])
+                st.write("Server Path:", full_path)
+                st.write("File Exists:", os.path.exists(full_path))
 
                 img = load_image(item["image"])
                 st.image(img, use_container_width=True)
@@ -644,14 +644,6 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
-
-
-
-
-
-
-
-
 
 
 
