@@ -203,15 +203,16 @@ if st.session_state["page"] == "menu":
         with st.container(border=True):
             c1, c2 = st.columns([1, 2])
             
-            with c1:
-                st.write("DB Image Path:", item["image"])
+           with c1:
+                # 1. Get the image URL from your database item
+                img_url = item.get("image")
 
-                full_path = os.path.join(BASE_DIR, item["image"])
-                st.write("Server Path:", full_path)
-                st.write("File Exists:", os.path.exists(full_path))
-
-                img = load_image(item["image"])
-                st.image(img, use_container_width=True)
+                # 2. If it's a Cloudinary link, show it directly
+                if img_url and str(img_url).startswith("http"):
+                    st.image(img_url, use_container_width=True)
+                else:
+                    # 3. If there's no image or it's an old local path, show a placeholder
+                    st.image("https://via.placeholder.com/150", caption="No Image")
             
             with c2:
                 st.markdown(f"""
@@ -643,6 +644,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
