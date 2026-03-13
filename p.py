@@ -33,9 +33,7 @@ db = mysql.connector.connect(
 cursor = db.cursor(dictionary=True)
 
 # --- DIRECTORIES ---
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-IMAGE_DIR = os.path.join(BASE_DIR, "menu_images")
-os.makedirs(IMAGE_DIR, exist_ok=True)
+
 
 # --- SESSION STATE INITIALIZATION ---
 if "page" not in st.session_state:
@@ -48,9 +46,8 @@ if "email" not in st.session_state:
 def load_image(image_path):
     if not image_path:
         return Image.new("RGB", (300, 300), (200, 200, 200))
-
-    full_path = os.path.join(IMAGE_DIR, os.path.basename(image_path))
-
+         final_image_path = item["image"]
+         st.image(final_image_path, width=200)
     if os.path.exists(full_path):
         try:
             return Image.open(full_path)
@@ -644,6 +641,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
