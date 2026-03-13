@@ -199,11 +199,12 @@ if st.session_state["page"] == "menu":
 
     # --- 3. RENDER MENU ITEMS (Single Column - No Scroll) ---
     for item in display_items:
-        # Each item gets its own container, creating a natural vertical list
+        # Each item gets its own container
         with st.container(border=True):
+            # Line up these columns
             c1, c2 = st.columns([1, 2])
             
-           with c1:
+            with c1: # Fixed indentation here
                 # 1. Get the image URL from your database item
                 img_url = item.get("image")
 
@@ -211,14 +212,14 @@ if st.session_state["page"] == "menu":
                 if img_url and str(img_url).startswith("http"):
                     st.image(img_url, use_container_width=True)
                 else:
-                    # 3. If there's no image or it's an old local path, show a placeholder
+                    # 3. Fallback for old local paths or missing images
                     st.image("https://via.placeholder.com/150", caption="No Image")
             
-            with c2:
+            with c2: # Fixed indentation here
                 st.markdown(f"""
                     <div style="line-height: 1.2;">
                         <strong style="font-size: 14px;">{item['v_name']}</strong><br>
-                        <span style="color:gray; font-size:11px;">{item['name']}</span>
+                        <span style="color:gray ; font-size:11px;">{item['name']}</span>
                     </div>
                     <div style="font-weight:bold; font-size:16px; margin-top: 5px;">₹{item['v_price']}</div>
                 """, unsafe_allow_html=True)
@@ -644,6 +645,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
