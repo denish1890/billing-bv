@@ -271,28 +271,25 @@ elif st.session_state["page"] == "cart":
             st.rerun()
     else:
         # Loop through items
+        # Loop through items
         for i in st.session_state["items"].copy():
             # Create a "Card" for each item using a container
             with st.container(border=True):
                 # We use 2 columns for the top row: Image + Details/Price
                 top_col1, top_col2 = st.columns([1, 3])
                 
-              with top_col1:
-                    # Use the URL directly from Cloudinary instead of calling load_image
+                with top_col1: # Line 280 fixed
                     cart_img = i.get("image") 
-                    
                     if cart_img and str(cart_img).startswith("http"):
                         st.image(cart_img, use_container_width=True)
                     else:
-                        # This shows if the link is broken or missing
                         st.image("https://via.placeholder.com/100", use_container_width=True)
 
-              with top_col2:
+                with top_col2:
                     st.markdown(f"**{i['item']}**")
                     st.caption(f"Variant: {i['variant']} | Price: {i['price']}₹")
                 
-                # We use 2 columns for the bottom row: Quantity + Remove button
-                # This stacks perfectly on mobile
+                # Bottom row: Quantity + Remove button
                 bot_col1, bot_col2 = st.columns([3, 1])
                 
                 with bot_col1:
@@ -301,12 +298,12 @@ elif st.session_state["page"] == "cart":
                         min_value=0,
                         value=i["quantity"],
                         key=f"cart_{i['menu_id']}_{i['variant']}",
-                        label_visibility="collapsed" # Hides label to save vertical space
+                        label_visibility="collapsed"
                     )
                     i["quantity"] = new_qty
                     i["total"] = new_qty * i["price"]
                 
-                with bot_col2:
+                with bot_col2: 
                     if st.button("🗑️", key=f"remove_{i['menu_id']}_{i['variant']}", use_container_width=True):
                         st.session_state["items"].remove(i)
                         st.rerun()
@@ -646,6 +643,7 @@ elif st.session_state["page"] == "downloadbill":
      pdf.output(file_name)
 
      st.success("Bill saved to your system!")
+
 
 
 
