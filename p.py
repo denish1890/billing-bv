@@ -10,6 +10,9 @@ import urllib.parse
 import json
 import os
 import time
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 # --- INITIAL CONFIGURATION ---
 st.set_page_config(
@@ -21,12 +24,7 @@ st.set_page_config(
 
 # --- DATABASE CONNECTION ---
 # Note: Ensure your local MySQL server is running
-port = os.getenv("MYSQLPORT")
 
-if port is None:
-    port = 3306
-else:
-    port = int(port)
 # --- DATABASE CONNECTION (TiDB Cloud) ---
 db = mysql.connector.connect(
         host="gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
@@ -39,10 +37,11 @@ db = mysql.connector.connect(
 )
 # This line must be indented exactly like 'db =' above it
 cursor = db.cursor(dictionary=True)  
-# --- DIRECTORIES ---
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-IMAGE_DIR = os.path.join(BASE_DIR, "menu_images")
-os.makedirs(IMAGE_DIR, exist_ok=True)
+cloudinary.config(
+    cloud_name="dfnd7rqbg",
+    api_key="635954955762459",
+    api_secret="EcCKClRGodV5S1oeEk5LBvANA-k"
+)
 
 # --- SESSION STATE INITIALIZATION ---
 if "page" not in st.session_state:
@@ -52,23 +51,11 @@ if "items" not in st.session_state:
 if "email" not in st.session_state:
     st.session_state["email"] = None
 
-def load_image(image_path):
-    if not image_path:
-        return Image.new("RGB", (300, 300), (200, 200, 200))
-
-    # If DB path is relative, resolve it
-    full_path = image_path
-    if not os.path.isabs(image_path):
-        full_path = os.path.join(BASE_DIR, image_path)
-
-    if os.path.exists(full_path):
-        try:
-            return Image.open(full_path)
-        except:
-            pass
-
-    return Image.new("RGB", (300, 300), (200, 200, 200))
-
+def load_image(image_url):
+   if not image_url:
+        return "https://via.placeholder.com/300"
+   return image_url
+   
 # --- CUSTOM CSS (Your Design) ---
 st.markdown("""
 <style>
@@ -501,14 +488,7 @@ if st.session_state["page"] == "menu":
                 # Unique key for identifying this specific card
                 variant_item['unique_key'] = f"{item['id']}_{v['name']}"
                 menu_to_show.append(variant_item)
-    
-    import base64
-
-    def get_image_base64(img):
-        buffered = io.BytesIO()
-        img.save(buffered, format="PNG")
-        return base64.b64encode(buffered.getvalue()).decode()
-    
+   
     # --- START SCROLLABLE AREA ---
     st.markdown('<div class="scrollable-menu">', unsafe_allow_html=True)
 
@@ -523,8 +503,7 @@ if st.session_state["page"] == "menu":
                 u_key = item['unique_key'] # Use this for the key
 
                 with cols[j]:
-                    pil_img = load_image(item["image"])
-                    img_base64 = get_image_base64(pil_img)
+                   img_url = load_image(item["image"])
 
                     with st.container(border=True):
                         st.markdown(f"""
