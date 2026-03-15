@@ -494,7 +494,7 @@ if st.session_state["page"] == "menu":
 
     # Grid Layout
     for i in range(0, len(menu_to_show), 2):
-    cols = st.columns(2)
+       cols = st.columns(2)
 
     for j in range(2):
         if i + j < len(menu_to_show):
