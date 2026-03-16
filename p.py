@@ -503,9 +503,10 @@ if st.session_state["page"] == "menu":
             price = item['active_variant_price']
             u_key = item['unique_key']
 
-           with cols[j]:
-                   st.write(item["image"])   # 🔍 Debug line
-                   img_base64 = load_image(item["image"])
+            with cols[j]:
+                st.write(item["image"])  # 🔍 Debug line
+                img_base64 = load_image(item["image"])
+
                 with st.container(border=True):
                     st.markdown(f"""
                         <img src="data:image/png;base64,{img_base64}" class="custom-item-image">
@@ -535,6 +536,7 @@ if st.session_state["page"] == "menu":
                             key=f"qty_{item['id']}_{v_name}_{i}",
                             label_visibility="collapsed"
                         )
+
                         # Update Cart Logic
                         if qty > 0:
                             if existing_item:
@@ -542,9 +544,13 @@ if st.session_state["page"] == "menu":
                                 existing_item["total"] = qty * price
                             else:
                                 st.session_state["items"].append({
-                                    "item": item["name"], "menu_id": item["id"],
-                                    "price": price, "quantity": qty, "total": qty * price,
-                                    "image": item["image"], "variant": v_name
+                                    "item": item["name"],
+                                    "menu_id": item["id"],
+                                    "price": price,
+                                    "quantity": qty,
+                                    "total": qty * price,
+                                    "image": item["image"],
+                                    "variant": v_name
                                 })
                         elif existing_item:
                             st.session_state["items"] = [x for x in st.session_state["items"] if not (x["menu_id"] == item["id"] and x["variant"] == v_name)]
