@@ -578,7 +578,7 @@ for i in range(0, len(menu_to_show), 2):
         
     
 elif st.session_state["page"]== "cart":
- st.title("Your Cart")
+     st.title("Your Cart")
  
  if not st.session_state["items"]:
      st.warning("Your Cart Is Empty!")
