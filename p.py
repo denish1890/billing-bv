@@ -493,10 +493,11 @@ if st.session_state["page"] == "menu":
     st.markdown('<div class="scrollable-menu">', unsafe_allow_html=True)
 
     # Grid Layout
-    for i in range(0, len(menu_to_show), 2):
-       cols = st.columns(2)
+    # Grid Layout
+for i in range(0, len(menu_to_show), 2):
+    cols = st.columns(2)
 
-      for j in range(2):
+    for j in range(2):
         if i + j < len(menu_to_show):
             item = menu_to_show[i + j]
             v_name = item['active_variant_name']
@@ -504,7 +505,8 @@ if st.session_state["page"] == "menu":
             u_key = item['unique_key']
 
             with cols[j]:
-                st.write(item["image"])  # 🔍 Debug line
+                st.write(item["image"])  
+
                 img_base64 = load_image(item["image"])
 
                 with st.container(border=True):
